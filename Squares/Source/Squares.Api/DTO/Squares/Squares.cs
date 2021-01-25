@@ -4,6 +4,6 @@ namespace Squares.Api.DTO.Squares
 {
     public class Squares
     {
-        public List<System.Drawing.Point> SquarePoints { get; set; }
+        public List<Point.Point> SquarePoints { get; set; }
     }
 }

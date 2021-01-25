@@ -3,9 +3,12 @@ using Microsoft.Extensions.Logging;
 using Squares.Api.Data.Models;
 using Squares.Api.DTO.List;
 using Squares.Api.DTO.Point;
+using Squares.Api.DTO.Squares;
 using Squares.Api.Maps;
 using Squares.Api.Processors;
+using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Squares.Api.Controllers
@@ -17,13 +20,11 @@ namespace Squares.Api.Controllers
     [ApiController]
     public class ListOfPointsController : ControllerBase
     {
-        private readonly ILogger<ListOfPointsController> logger;
         private readonly IListOfPointsQueryProcessor queryProcessor;
         private readonly IAutoMapper autoMapper;
 
-        public ListOfPointsController(ILogger<ListOfPointsController> logger, IListOfPointsQueryProcessor queryProcessor, IAutoMapper autoMapper)
+        public ListOfPointsController( IListOfPointsQueryProcessor queryProcessor, IAutoMapper autoMapper)
         {
-            this.logger = logger;
             this.queryProcessor = queryProcessor;
             this.autoMapper = autoMapper;
         }
@@ -103,10 +104,19 @@ namespace Squares.Api.Controllers
         /// </summary>
         /// <param name="id">List ID.</param>
         [HttpGet]
-        [Route("RemovePoints/{id}")]
-        public async void CalculateSquares(int id)
+        [Route("CalculateSquares/{id}")]
+        public async Task<SquaresTotal> CalculateSquares(int id)
         {
-            await queryProcessor.CalculateSquares(id);
+            try
+            {
+                 var result = await queryProcessor.CalculateSquares(id);
+                return result;
+            }
+            catch (TimeoutException)
+            {
+                HttpContext.Response.StatusCode = (int)HttpStatusCode.RequestTimeout;
+                return new SquaresTotal();
+            }
         }
     }
 }

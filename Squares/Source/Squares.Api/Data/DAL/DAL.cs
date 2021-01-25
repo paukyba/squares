@@ -52,6 +52,7 @@ namespace Squares.Api.Data.DAL
                 var item = apiContext.SquarePointsLists.First(x => x.Id == id);
 
                 apiContext.SquarePointsLists.Remove(item);
+
                 await apiContext.SaveChangesAsync();
             }
             catch

@@ -1,4 +1,5 @@
-﻿using Squares.Api.Data.Models;
+﻿using Microsoft.Extensions.Logging;
+using Squares.Api.Data.Models;
 using Squares.Api.DTO.Squares;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,13 @@ namespace Squares.Api.Processors
     /// </summary>
     public class SquaresProcessor : ISquaresProcessor
     {
+        private readonly ILogger<SquaresProcessor> logger;
+
+        public SquaresProcessor(ILogger<SquaresProcessor> logger)
+        {
+            this.logger = logger;
+        }
+
         /// <summary>
         /// Finds all squares. 
         /// </summary>
@@ -21,6 +29,12 @@ namespace Squares.Api.Processors
         /// <returns>All found squares with coordinates.</returns>
         public async Task<SquaresTotal> FindAllSquares(ListOfPointsModel listOfPointsModel, int timoutMs)
         {
+            if(listOfPointsModel.Points == null || listOfPointsModel.Points.Count == 0)
+            {
+                this.logger.LogError("List doest not have any points.");
+                return null; ;
+            }
+
             var task = SquareCount(listOfPointsModel.Points.Select(point => new Point { X = point.X, Y = point.Y }).ToArray());
 
             if (await Task.WhenAny(task, Task.Delay(timoutMs)) == task)
@@ -33,7 +47,16 @@ namespace Squares.Api.Processors
                     ListName = listOfPointsModel.ListName,
                     TotalSquares = allSquares.Count,
                     Squares = allSquares.Select(x => 
-                        new DTO.Squares.Squares { SquarePoints = new List<Point> { x.A, x.B, x.C, x.D } }
+                        new DTO.Squares.Squares 
+                        { 
+                            SquarePoints = new List<DTO.Point.Point> 
+                            { 
+                                new DTO.Point.Point {X = x.A.X, Y = x.A.Y },
+                                new DTO.Point.Point {X = x.B.X, Y = x.B.Y },
+                                new DTO.Point.Point {X = x.C.X, Y = x.C.Y },
+                                new DTO.Point.Point {X = x.D.X, Y = x.D.Y },
+                            } 
+                        }
                     ).ToList()
                 };
             }
