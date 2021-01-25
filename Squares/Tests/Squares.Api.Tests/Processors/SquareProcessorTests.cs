@@ -123,7 +123,7 @@ namespace Squares.Api.Tests.Processors
                 , Constants.SquareCalculationTimeoutMs).Result;
 
             // Asssert
-            Assert.AreEqual(result.TotalSquares, 80);
+            Assert.AreEqual(24, result.TotalSquares);
         }
 
         private List<PointModel> GenerateCoordinateGrid(int n)

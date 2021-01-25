@@ -109,7 +109,7 @@ namespace Squares.Api.Controllers
         {
             try
             {
-                 var result = await queryProcessor.CalculateSquares(id);
+                var result = await queryProcessor.CalculateSquares(id);
                 return result;
             }
             catch (TimeoutException)

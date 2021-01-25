@@ -100,8 +100,8 @@ namespace Squares.Api.Processors
                         if (i == j)
                             continue;
                         //For each Point i, Point j, check if b&d exist in set.
-                        Point[] DiagVertex = GetRestPoints(distinctPoints[i], distinctPoints[j]);
-                        if (set.Contains(DiagVertex[0]) && set.Contains(DiagVertex[1]))
+                        Point[] DiagVertex = GetRestPoints(distinctPoints[i], distinctPoints[j], out var validCoordinates);
+                        if (validCoordinates && set.Contains(DiagVertex[0]) && set.Contains(DiagVertex[1]))
                         {
                             var sortedPoints = new[] { distinctPoints[i], distinctPoints[j], DiagVertex[0], DiagVertex[1] }.OrderBy(x => x.X).ThenBy(x => x.Y).ToArray();
 
@@ -121,7 +121,7 @@ namespace Squares.Api.Processors
             });
         }
 
-        public Point[] GetRestPoints(Point a, Point c)
+        public Point[] GetRestPoints(Point a, Point c, out bool coordinatesValid)
         {
             Point[] res = new Point[2];
 
@@ -132,6 +132,10 @@ namespace Squares.Api.Processors
             double Ay = a.Y - midY;
             double bX = midX - Ay;
             double bY = midY + Ax;
+
+            var asd = bX % 1;
+
+
             Point b = new Point { X = (int)bX, Y = (int)bY };
 
             double cX = (c.X - midX);
@@ -142,7 +146,22 @@ namespace Squares.Api.Processors
 
             res[0] = b;
             res[1] = d;
+
+            coordinatesValid = IsNewCoordinatesValid(bX, bY, dX, dY);
             return res;
+        }
+
+        /// <summary>
+        /// Checks if all coordinates are whole numbers, non whole number coordinates are not possible
+        /// </summary>
+        /// <param name="bX"></param>
+        /// <param name="bY"></param>
+        /// <param name="dX"></param>
+        /// <param name="dY"></param>
+        /// <returns></returns>
+        private bool IsNewCoordinatesValid(double bX, double bY, double dX, double dY)
+        {
+            return bX % 1 == 0 && bY % 1 == 0 && dX % 1 == 0 && dY % 1 == 0;
         }
     }
 }
