@@ -1,8 +1,8 @@
-﻿using Squares.Models.Point;
+﻿using Squares.Api.DTO.Point;
 
-namespace Squares.Models.List
+namespace Squares.Api.DTO.List
 {
-    public class CreateSquaresPointsList
+    public class CreateListOfPoints
     {       
         public string ListName { get; set; }
 

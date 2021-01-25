@@ -1,20 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Squares.Data.DAL;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Squares.Data.EF;
+using Squares.Api.Maps;
+using Squares.Api.Data.DAL;
+using Squares.Api.Data.EF;
+using Squares.Api.Processors;
 
 namespace Squares.Api
 {
@@ -46,16 +42,20 @@ namespace Squares.Api
                 options.IncludeXmlComments(filePath);
 
             });
-
            
             services.AddDbContext<ApiContext>(opt => opt.UseInMemoryDatabase("SquareDB"));
 
-
             services.AddScoped<ApiContext>();
 
-            services.AddScoped<IDAL>(ctx => new DAL(ctx.GetRequiredService<ApiContext>()));
+            services.AddScoped<IDAL, DAL>();
+
+            services.AddScoped<IListOfPointsQueryProcessor, ListOfPointsQueryProcessor>();
+
+            services.AddScoped<ISquaresProcessor, SquaresProcessor>(); 
 
             services.AddEntityFrameworkInMemoryDatabase();
+
+            ConfigureAutoMapper(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,6 +69,7 @@ namespace Squares.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
 
             app.UseAuthorization();
 
@@ -85,7 +86,15 @@ namespace Squares.Api
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Squares solution");
                 
                 options.RoutePrefix = string.Empty;
-            });       
+            });
+        }
+
+        private static void ConfigureAutoMapper(IServiceCollection services)
+        {
+            var mapperConfig = AutoMapperConfigurator.Configure();
+            var mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(x => mapper);
+            services.AddTransient<IAutoMapper, AutoMapperAdapter>();
         }
     }
 }

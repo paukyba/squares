@@ -1,10 +1,8 @@
-﻿namespace Squares.Models.List
+﻿namespace Squares.Api.DTO.Point
 {
     public class Point
     {
-        int Id { get; set; }
-
-        int ListId { get; set; }
+        public int Id { get; set; }
 
         public int X { get; set; }
 

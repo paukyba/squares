@@ -1,4 +1,4 @@
-﻿namespace Squares.Models.Point
+﻿namespace Squares.Api.DTO.Point
 {
     public class CreatePoint
     {
